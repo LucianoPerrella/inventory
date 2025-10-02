@@ -13,7 +13,7 @@ app.use(express.static('public'));
 
 // --- PostgreSQL Pool para RDS ---
 const pool = new Pool({
-  host: process.env.DB_HOST || inventorydb.cz6imua8gy2g.us-east-1.rds.amazonaws.com', 
+  host: process.env.DB_HOST || 'inventorydb.cz6imua8gy2g.us-east-1.rds.amazonaws.com', 
   port: Number(process.env.DB_PORT) || 5432,
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASS || 'inventory',
