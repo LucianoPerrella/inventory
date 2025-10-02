@@ -1,8 +1,5 @@
-USER DATA
 #!/bin/bash
 set -e
-
-# Crear log desde el principio
 touch /var/log/user-data.log
 exec > /var/log/user-data.log 2>&1
 
@@ -51,6 +48,11 @@ Restart=always
 RestartSec=10
 Environment="PORT=3001"
 Environment="NODE_ENV=production"
+Environment="DB_HOST=inventorydb.cz6imua8gy2g.us-east-1.rds.amazonaws.com"
+Environment="DB_PORT=5432"
+Environment="DB_USER=postgres"
+Environment="DB_PASS=inventory"
+Environment="DB_NAME=inventorydb"
 
 [Install]
 WantedBy=multi-user.target
