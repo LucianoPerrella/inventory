@@ -58,6 +58,9 @@ Environment="DB_NAME=inventorydb"
 WantedBy=multi-user.target
 EOF
 
+echo "Contenido del archivo de servicio:"
+cat /etc/systemd/system/inventory.service
+
 echo "Iniciando servicio..."
 systemctl daemon-reload
 systemctl enable inventory.service
@@ -69,8 +72,8 @@ sleep 15
 echo "Estado del servicio:"
 systemctl status inventory.service --no-pager || true
 
-echo "Verificando puerto 3001..."
-netstat -tlnp | grep 3001 || echo "Puerto no detectado aun"
+echo "Logs del servicio:"
+journalctl -u inventory.service -n 20 --no-pager || true
 
 echo "Configurando Nginx..."
 cat > /etc/nginx/sites-available/inventory <<'EOF'
