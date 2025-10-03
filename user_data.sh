@@ -29,6 +29,7 @@ chown -R ubuntu:ubuntu /opt/inventory
 
 echo "Instalando dependencias npm..."
 cd /opt/inventory
+# Usar --production para instalar solo dependencias de producción
 sudo -u ubuntu npm install --production
 
 echo "Verificando server.js..."
@@ -39,11 +40,6 @@ cat > /etc/systemd/system/inventory.service <<'EOF'
 [Unit]
 Description=Inventory App
 After=network.target
-Environment="DB_HOST=inventorydb.cz6imua8gy2g.us-east-1.rds.amazonaws.com"
-Environment="DB_PORT=5432"
-Environment="DB_USER=postgres"
-Environment="DB_PASS=inventory"
-Environment="DB_NAME=inventorydb"
 
 [Service]
 User=ubuntu
@@ -53,11 +49,12 @@ Restart=always
 RestartSec=10
 Environment="PORT=3001"
 Environment="NODE_ENV=production"
-Environment="DB_HOST=inventorydb.cz6imua8gy2g.us-east-1.rds.amazonaws.com"
+# **CORRECCIÓN AQUÍ: Quitadas las comillas dobles que encerraban el valor de la URL**
+Environment="DB_HOST=inventory.cz6imua8gy2g.us-east-1.rds.amazonaws.com"
 Environment="DB_PORT=5432"
 Environment="DB_USER=postgres"
 Environment="DB_PASS=inventory"
-Environment="DB_NAME=inventorydb"
+Environment="DB_NAME=inventory"
 
 [Install]
 WantedBy=multi-user.target
