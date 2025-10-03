@@ -1,8 +1,5 @@
-USER DATA
 #!/bin/bash
 set -e
-
-# Crear log desde el principio
 touch /var/log/user-data.log
 exec > /var/log/user-data.log 2>&1
 
@@ -42,6 +39,11 @@ cat > /etc/systemd/system/inventory.service <<'EOF'
 [Unit]
 Description=Inventory App
 After=network.target
+Environment="DB_HOST=inventorydb.cz6imua8gy2g.us-east-1.rds.amazonaws.com"
+Environment="DB_PORT=5432"
+Environment="DB_USER=postgres"
+Environment="DB_PASS=inventory"
+Environment="DB_NAME=inventorydb"
 
 [Service]
 User=ubuntu
@@ -51,10 +53,18 @@ Restart=always
 RestartSec=10
 Environment="PORT=3001"
 Environment="NODE_ENV=production"
+Environment="DB_HOST=inventorydb.cz6imua8gy2g.us-east-1.rds.amazonaws.com"
+Environment="DB_PORT=5432"
+Environment="DB_USER=postgres"
+Environment="DB_PASS=inventory"
+Environment="DB_NAME=inventorydb"
 
 [Install]
 WantedBy=multi-user.target
 EOF
+
+echo "Contenido del archivo de servicio:"
+cat /etc/systemd/system/inventory.service
 
 echo "Iniciando servicio..."
 systemctl daemon-reload
@@ -67,8 +77,8 @@ sleep 15
 echo "Estado del servicio:"
 systemctl status inventory.service --no-pager || true
 
-echo "Verificando puerto 3001..."
-netstat -tlnp | grep 3001 || echo "Puerto no detectado aun"
+echo "Logs del servicio:"
+journalctl -u inventory.service -n 20 --no-pager || true
 
 echo "Configurando Nginx..."
 cat > /etc/nginx/sites-available/inventory <<'EOF'
