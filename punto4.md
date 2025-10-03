@@ -1,4 +1,6 @@
 📦 Inventario de Productos (Node.js + Express + PostgreSQL/RDS)
+
+
 📝 Descripción General
 Inventory App es una aplicación de gestión de inventario basada en Node.js y Express. Su función principal es permitir operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre productos que se almacenan de manera persistente en una base de datos PostgreSQL.
 
