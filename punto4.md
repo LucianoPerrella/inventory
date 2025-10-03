@@ -1,8 +1,8 @@
-📦 Inventory App (Node.js + Express + PostgreSQL/RDS)
-📝 Descripción del Proyecto
-Inventory App es una aplicación de gestión de inventario básica construida en Node.js y Express que permite crear, leer, actualizar y eliminar (CRUD) productos en una base de datos PostgreSQL persistente.
+📦 Inventario de Productos (Node.js + Express + PostgreSQL/RDS)
+📝 Descripción General
+Inventory App es una aplicación de gestión de inventario basada en Node.js y Express. Permite realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre productos almacenados en una base de datos PostgreSQL.
 
-El objetivo principal de este proyecto, además de la funcionalidad CRUD, es demostrar la automatización y el despliegue de una aplicación web moderna en la infraestructura de Amazon Web Services (AWS).
+El enfoque de este proyecto es la automatización del despliegue en la nube, utilizando Amazon Web Services (AWS).
 
 🛠️ Stack Tecnológico
 Componente
@@ -21,75 +21,77 @@ Framework
 
 Express.js
 
-Framework minimalista para la API REST.
+Framework minimalista para crear la API REST.
 
 Base de Datos
 
 PostgreSQL (RDS)
 
-Almacenamiento persistente de los datos de inventario.
+Almacenamiento persistente y escalable.
 
 Driver DB
 
 pg (node-postgres)
 
-Cliente para interactuar con la base de datos.
+Cliente para la interacción entre la aplicación y la base de datos.
 
-Web Server
+Proxy Web
 
 Nginx
 
-Proxy inverso para manejar el tráfico HTTP (puerto 80) y dirigirlo a la aplicación Node.js (puerto 3001).
+Servidor proxy inverso, dirige el tráfico HTTP (puerto 80) a la aplicación Node.js (puerto 3001).
 
-🚀 Despliegue en AWS (EC2/RDS)
-El despliegue está diseñado para ser completamente automatizado utilizando el mecanismo de User Data de AWS, que ejecuta un script de aprovisionamiento en Bash al iniciar la instancia EC2.
+🚀 Despliegue Automatizado en AWS
+El despliegue de la aplicación en una instancia EC2 es completamente automatizado a través del script User Data de AWS.
 
-1. Pre-requisitos de Infraestructura
-Para el despliegue se requiere:
+1. Pre-requisitos de Infraestructura y Red
+Para un despliegue exitoso, la infraestructura debe cumplir con los siguientes requisitos:
 
-Instancia EC2 (Ubuntu 20.04/22.04): Para alojar la aplicación Node.js.
+Instancia EC2 (Ubuntu): Servidor de la aplicación.
 
-Instancia RDS (PostgreSQL): Base de datos configurada.
+Instancia RDS (PostgreSQL): Servicio de base de datos.
 
-Configuración de Red:
+Configuración de Grupos de Seguridad:
 
-Grupo de Seguridad de RDS: Debe permitir tráfico de entrada (Inbound) en el puerto 5432 únicamente desde el Grupo de Seguridad del EC2.
+RDS Inbound: Permitir tráfico en el puerto 5432 solo desde el ID del Grupo de Seguridad del EC2.
 
-Grupo de Seguridad de EC2: Debe permitir tráfico de salida (Outbound) al puerto 5432 y tráfico de entrada (Inbound) al puerto 80 (HTTP).
+EC2 Outbound: Permitir tráfico saliente en el puerto 5432.
 
-2. Archivos Clave
+EC2 Inbound: Permitir tráfico entrante en el puerto 80 (HTTP) desde Internet (0.0.0.0/0).
+
+2. Archivos Clave del Despliegue
 Archivo
 
-Función
+Rol en el Despliegue
 
 server.js
 
-Contiene la lógica de la API, el pool de conexiones PostgreSQL y la función de bootstrapping (CREATE TABLE IF NOT EXISTS products...) para inicializar la base de datos.
+Contiene la lógica de conexión a PostgreSQL y la función de bootstrapping para crear la tabla products e insertar datos de ejemplo si la DB está vacía.
 
 user_data.sh (Script)
 
-Script de automatización que instala dependencias, clona el código, configura el servicio Systemd con las credenciales de RDS e instala Nginx.
+Script de automatización que aprovisiona el servidor (instala Node.js, configura Systemd y Nginx).
 
 inventory.service
 
-Archivo de configuración de Systemd que mantiene la aplicación corriendo en segundo plano y la reinicia automáticamente en caso de fallos.
+Archivo de configuración de Systemd que gestiona la aplicación como un servicio en segundo plano, asegurando su reinicio automático.
 
-3. Proceso de Despliegue Automatizado (User Data)
-El script de User Data realiza las siguientes tareas al iniciar la instancia:
+3. Fases del Proceso Automatizado (User Data)
+El script de User Data ejecuta las siguientes tareas:
 
-Instalación: Instala git, curl, nginx y el runtime de Node.js (v18).
+Instalación de Dependencias: Instala Node.js, Nginx, Git y utilidades básicas.
 
-Clonación: Clona el repositorio a /opt/inventory e instala las dependencias de NPM.
+Clonación y Configuración: Clona el repositorio a /opt/inventory e instala las dependencias de NPM.
 
-Systemd Setup: Crea el archivo inventory.service y configura las variables de entorno de RDS (DB_HOST, DB_USER, DB_PASS, etc.) para que la aplicación pueda conectarse.
+Systemd Setup: Crea el servicio inventory.service, inyectando las variables de entorno de RDS (DB_HOST, DB_USER, DB_PASS, etc.) para permitir la conexión a la base de datos.
 
-Servicio: Recarga el demonio de Systemd, habilita e inicia el servicio inventory.service.
+Inicio del Servicio: Habilita e inicia el servicio inventory.service para que la aplicación comience a correr en el puerto 3001.
 
-Proxy Nginx: Configura Nginx para actuar como un proxy inverso, dirigiendo todo el tráfico entrante del puerto 80 al puerto 3001, donde se ejecuta la aplicación Node.js.
+Proxy Nginx: Configura y reinicia Nginx para que escuche el tráfico web en el puerto 80 y lo redirija (proxy inverso) al puerto 3001.
 
-💡 Notas Importantes sobre Conectividad
-La persistencia de datos se garantiza con la conexión a PostgreSQL.
+💡 Notas de Persistencia y Mantenimiento
+Conexión DB: La aplicación usa process.env para obtener las credenciales de la base de datos, lo que la hace portable a cualquier entorno (EC2, Elastic Beanstalk, local).
 
-El archivo server.js incluye un mecanismo de Health Check y manejo de errores de conexión para diagnosticar problemas de red o credenciales.
+Bootstrapping: El server.js asegura que el esquema de la tabla products esté siempre disponible, incluso si se conecta a una base de datos recién creada.
 
-Si la base de datos se inicia vacía, el proceso de bootstrapping insertará productos de ejemplo automáticamente.
+Monitoreo: El estado del servicio puede ser verificado en la instancia EC2 con sudo systemctl status inventory.service.
