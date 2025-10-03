@@ -19,7 +19,7 @@ const pool = new Pool({
   port: Number(process.env.DB_PORT) || 5432,
   user: process.env.DB_USER || "postgres",
   password: process.env.DB_PASS || "inventory",
-  database: process.env.DB_NAME || "inventorydb",
+  database: process.env.DB_NAME || "inventoryb",
   ssl: {
     rejectUnauthorized: false, // Requerido para RDS
   },
