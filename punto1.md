@@ -149,7 +149,6 @@ Consigna 2
 Instancia automatizada: ec2-3-84-200-127.compute-1.amazonaws.com
 
 En la instancia seleccionada, se necesita modificar User Data con el siguiente script:
-USER DATA
 #!/bin/bash
 set -e
 
@@ -257,7 +256,10 @@ echo "INSTALACION COMPLETADA: $(date)"
 echo "Aplicacion disponible en: http://$PUBLIC_IP"
 echo "=========================================="
 
-Aclaración: en el punto 4 se modifica el proyecto. Actualmente, en esta instancia corre con el siguiente userdata para incluir RDS y PostGres:
+
+-------
+
+Aclaración: actualmente la instancia con userdata corre el siguiente script para integrar postgres y RDS:
 #!/bin/bash
 set -e
 touch /var/log/user-data.log
@@ -372,4 +374,3 @@ echo "=========================================="
 echo "INSTALACION COMPLETADA: $(date)"
 echo "Aplicacion disponible en: http://$PUBLIC_IP"
 echo "=========================================="
-
